@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * @file
+ * axelerant_api.module
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function axelerant_api_permission() {
+    return array(
+        'access axelerant api'  => array(
+            'title'         => t('Access axelerant api'),
+            'description'   => t('Access axelerant api.'),
+        ),
+    );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function axelerant_api_menu()
+{
+
+    $items = array();
+
+    $items['page_json/%/%'] = array(
+        'title' => t(''),
+        'type' => MENU_CALLBACK,
+        'page callback' => 'getPageDataInJsonFormat',
+        'file' => 'axelerant_api_admin.inc',
+        'access arguments' => array('access axelerant api'),
+        'page arguments' => array(1, 2),
+    );
+
+    return $items;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function axelerant_api_form_system_site_information_settings_alter(&$form, &$form_state, $form_id)
+{
+    // Set custom submit callback function
+    $form['#submit'][] = 'axelerant_api_form_system_site_information_settings_submit';
+
+    $form['site_api_configuration'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Site API Key Setting'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+
+    );
+
+    $form['site_api_configuration']['siteapikey'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Site API Key'),
+        '#description' => t('Enter your site api key.'),
+        '#default_value' => variable_get('siteapikey', 'No API Key yet'),
+        '#size' => 60,
+    );
+
+    if (variable_get('siteapikey')) {
+        $form['actions']['submit']['#value'] = t('Update Configuration');
+    }
+}
+
+/**
+ * This is a custom submit callback function
+ *
+ * @param $form
+ * @param $form_state
+ */
+function axelerant_api_form_system_site_information_settings_submit(&$form, &$form_state) {
+
+    if ($form_state['values']['siteapikey'] != '') {
+        drupal_set_message('Site API Key has been saved with that value.', 'status');
+    }
+}
+
+/**
+ * This function will be checking nid
+ * If the nid is valid and also type equal page
+ * then it'll return true otherise false
+ *
+ * This function is here (in .module file) because we can reuse
+ * from others module
+ *
+ * @param $pageId
+ * @return bool
+ */
+function isPage($pageId)
+{
+    $result = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('type', 'page', '=')
+        ->condition('nid', $pageId, '=')
+        ->execute()
+        ->fetchAssoc();
+
+    if ($result){
+        return true;
+    } else {
+        return false;
+    }
+}
