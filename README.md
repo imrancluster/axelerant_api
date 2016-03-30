@@ -17,3 +17,5 @@ This is a test D7 module for Axelerant.
 I created this test module using my prevous knowldege.
 For custom submit callback function I found a article, but the article was for custom validate function.
 I just used the concept and made my own custom submit callback function. [article link](http://befused.com/drupal/form-validation)
+
+**I spent almost 2 hours for this module.**
